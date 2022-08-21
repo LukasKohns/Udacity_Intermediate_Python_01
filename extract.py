@@ -9,8 +9,6 @@ formatted as described in the project instructions, into a collection of
 
 The main module calls these functions with the arguments provided at the command
 line, and uses the resulting collections to build an `NEODatabase`.
-
-You'll edit this file in Task 2.
 """
 import csv
 import json
@@ -24,8 +22,21 @@ def load_neos(neo_csv_path):
     :param neo_csv_path: A path to a CSV file containing data about near-Earth objects.
     :return: A collection of `NearEarthObject`s.
     """
-    # TODO: Load NEO data from the given CSV file.
-    return ()
+    neos = []
+    with open(neo_csv_path) as f:
+        reader = csv.DictReader(f)
+        for line in reader:
+            pdes = line["pdes"]
+            name = str(line["name"]) if line["name"] != "" else None
+            dia = float(line["diameter"]) if line["diameter"] != "" else float("nan")
+            haz = True if line["pha"] == "Y" else False
+
+            neos.append(
+                NearEarthObject(
+                    designation=pdes, name=name, diameter=dia, hazardous=haz
+                )
+            )
+    return neos
 
 
 def load_approaches(cad_json_path):
@@ -34,5 +45,16 @@ def load_approaches(cad_json_path):
     :param cad_json_path: A path to a JSON file containing data about close approaches.
     :return: A collection of `CloseApproach`es.
     """
-    # TODO: Load close approach data from the given JSON file.
-    return ()
+    approaches = []
+    with open(cad_json_path) as f:
+        jsreader = json.load(f)
+        for line in jsreader["data"]:
+            pdes = line[0]
+            time = line[3]
+            dist = line[4]
+            vel = line[7]
+            approaches.append(
+                CloseApproach(designation=pdes, time=time, distance=dist, velocity=vel)
+            )
+
+    return approaches

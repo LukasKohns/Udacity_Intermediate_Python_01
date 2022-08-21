@@ -13,10 +13,10 @@ the supplied `CloseApproach`.
 
 The `limit` function simply limits the maximum number of values produced by an
 iterator.
-
-You'll edit this file in Tasks 3a and 3c.
 """
+from calendar import c
 import operator
+import itertools
 
 
 class UnsupportedCriterionError(NotImplementedError):
@@ -38,6 +38,7 @@ class AttributeFilter:
     Concrete subclasses can override the `get` classmethod to provide custom
     behavior to fetch a desired attribute from the given `CloseApproach`.
     """
+
     def __init__(self, op, value):
         """Construct a new `AttributeFilter` from an binary predicate and a reference value.
 
@@ -72,12 +73,47 @@ class AttributeFilter:
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
 
+class DistFilter(AttributeFilter):
+    @classmethod
+    def get(cls, approach):
+        return approach.distance
+
+
+class DiaFilter(AttributeFilter):
+    @classmethod
+    def get(cls, approach):
+        return approach.neo.diameter
+
+
+class VeloFilter(AttributeFilter):
+    @classmethod
+    def get(cls, approach):
+        return approach.velocity
+
+
+class HazardFilter(AttributeFilter):
+    @classmethod
+    def get(cls, approach):
+        return approach.neo.hazardous
+
+
+class DateFilter(AttributeFilter):
+    @classmethod
+    def get(cls, approach):
+        return approach.time.date()
+
+
 def create_filters(
-        date=None, start_date=None, end_date=None,
-        distance_min=None, distance_max=None,
-        velocity_min=None, velocity_max=None,
-        diameter_min=None, diameter_max=None,
-        hazardous=None
+    date=None,
+    start_date=None,
+    end_date=None,
+    distance_min=None,
+    distance_max=None,
+    velocity_min=None,
+    velocity_max=None,
+    diameter_min=None,
+    diameter_max=None,
+    hazardous=None,
 ):
     """Create a collection of filters from user-specified criteria.
 
@@ -108,8 +144,40 @@ def create_filters(
     :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
     :return: A collection of filters for use with `query`.
     """
-    # TODO: Decide how you will represent your filters.
-    return ()
+    # container for Filters to return
+    filterlist = []
+
+    # Add Date Filter
+    if date is not None:
+        filterlist.append(DateFilter(operator.eq, date))
+    if start_date is not None:
+        filterlist.append(DateFilter(operator.ge, start_date))
+    if end_date is not None:
+        filterlist.append(DateFilter(operator.le, end_date))
+
+    # Add Distance Filters
+    if distance_min is not None:
+        filterlist.append(DistFilter(operator.ge, distance_min))
+    if distance_max is not None:
+        filterlist.append(DistFilter(operator.le, distance_max))
+
+    # Add Diameter Filters
+    if diameter_min is not None:
+        filterlist.append(DiaFilter(operator.ge, diameter_min))
+    if diameter_max is not None:
+        filterlist.append(DiaFilter(operator.le, diameter_max))
+
+    # Add Velocity Filters
+    if velocity_min is not None:
+        filterlist.append(VeloFilter(operator.ge, velocity_min))
+    if velocity_max is not None:
+        filterlist.append(VeloFilter(operator.le, velocity_max))
+
+    # Add Velocity Filters
+    if hazardous is not None:
+        filterlist.append(HazardFilter(operator.eq, hazardous))
+
+    return filterlist
 
 
 def limit(iterator, n=None):
@@ -121,5 +189,8 @@ def limit(iterator, n=None):
     :param n: The maximum number of values to produce.
     :yield: The first (at most) `n` values from the iterator.
     """
-    # TODO: Produce at most `n` values from the given iterator.
-    return iterator
+    # Produce at most `n` values from the given iterator.
+    if n == 0 or n == None:
+        return iterator
+    else:
+        return itertools.islice(iterator, n)
