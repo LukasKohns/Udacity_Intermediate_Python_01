@@ -70,36 +70,72 @@ class AttributeFilter:
         raise UnsupportedCriterionError
 
     def __repr__(self):
+        """Get human-readable representation of Filter."""
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
 
 class DistFilter(AttributeFilter):
+    """A class to generate Filters for min and max distance."""
+
     @classmethod
     def get(cls, approach):
+        """Get the distance from a close approach.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The value of distance.
+        """
         return approach.distance
 
 
 class DiaFilter(AttributeFilter):
+    """A class to generate Filters for min and max diameter."""
+
     @classmethod
     def get(cls, approach):
+        """Get the diameter from a close approache's neo.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The diameter of this approache's neo.
+        """
         return approach.neo.diameter
 
 
 class VeloFilter(AttributeFilter):
+    """A class to generate Filters for min and max velocity."""
+
     @classmethod
     def get(cls, approach):
+        """Get the velocity from a close approach.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The value of velocity.
+        """
         return approach.velocity
 
 
 class HazardFilter(AttributeFilter):
+    """A class to generate Filters for hazardousness of approache's neo."""
+
     @classmethod
     def get(cls, approach):
+        """Get the hazardousness from a close approache's neo.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: Whether or not this approache's neo is hazardous.
+        """
         return approach.neo.hazardous
 
 
 class DateFilter(AttributeFilter):
+    """A class to generate Filters for exact dates as well as before/after a date."""
+
     @classmethod
     def get(cls, approach):
+        """Get the date from a close approach.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The value of time as a date.
+        """
         return approach.time.date()
 
 
@@ -190,7 +226,7 @@ def limit(iterator, n=None):
     :yield: The first (at most) `n` values from the iterator.
     """
     # Produce at most `n` values from the given iterator.
-    if n == 0 or n == None:
+    if n == 0 or n is None:
         return iterator
     else:
         return itertools.islice(iterator, n)

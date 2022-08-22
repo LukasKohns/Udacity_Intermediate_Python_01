@@ -28,7 +28,8 @@ def load_neos(neo_csv_path):
         for line in reader:
             pdes = line["pdes"]
             name = str(line["name"]) if line["name"] != "" else None
-            dia = float(line["diameter"]) if line["diameter"] != "" else float("nan")
+            dia = float(line["diameter"]
+                        ) if line["diameter"] != "" else float("nan")
             haz = True if line["pha"] == "Y" else False
 
             neos.append(
@@ -54,7 +55,8 @@ def load_approaches(cad_json_path):
             dist = line[4]
             vel = line[7]
             approaches.append(
-                CloseApproach(designation=pdes, time=time, distance=dist, velocity=vel)
+                CloseApproach(designation=pdes, time=time,
+                              distance=dist, velocity=vel)
             )
 
     return approaches

@@ -124,9 +124,9 @@ class NEODatabase:
         for approach in self._approaches:
             viable = True
             for filter in filters:
-                if filter(approach) == False:
+                if not filter(approach):
                     viable = False
-            if viable == True:
+            if viable:
                 yield approach
             else:
                 continue
